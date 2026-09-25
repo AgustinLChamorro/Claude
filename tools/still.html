@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Render de la casa i2home</title>
+<style>html,body{margin:0;background:transparent}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script type="module">
+  import { createCasa } from '../js/casa3d.js';
+  const q = new URLSearchParams(location.search);
+  const w = +q.get('w') || 1200, h = +q.get('h') || 900;
+  const on = (q.get('on') || 'luces,clima').split(',').filter(Boolean);
+  const state = { luces: false, cortinas: false, clima: false, accesos: false, alarma: false, riego: false };
+  for (const item of on) { const [k, v] = item.split(':'); state[k] = v ? +v : true; }
+  const canvas = document.getElementById('c');
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  const casa = createCasa(canvas, {
+    still: true,
+    transparent: q.get('bg') === '0',
+    pixelRatio: +q.get('dpr') || 2,
+    shadowSize: 4096,
+    preset: q.get('preset') || 'hero',
+    state,
+  });
+  casa.resize(w, h);
+  casa.renderStill(+q.get('t') || 2.2);
+  window.__done = true;
+</script>
+</body>
+</html>

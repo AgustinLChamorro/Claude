@@ -1,0 +1,15 @@
+{
+  "name": "i2home-landing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Landing page de i2home: domótica y automatización inteligente.",
+  "scripts": {
+    "build": "esbuild src/casa3d.js --bundle --format=esm --minify --target=es2020 --outfile=js/casa3d.js",
+    "dev": "http-server -p 8080 -c-1 .",
+    "renders": "node tools/render-stills.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "three": "^0.186.1"
+  }
+}

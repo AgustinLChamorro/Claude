@@ -13,8 +13,15 @@ js/main.js              menú, casa interactiva, formulario y botón de WhatsApp
 js/casa3d.js            escena 3D compilada (no editar a mano: se genera desde src/)
 src/casa3d.js           código fuente de la escena 3D (three.js)
 assets/img/             imágenes del sitio (WebP) e imagen para redes (og.jpg)
+assets/logo/            logo de i2home: horizontal, apilado e isotipo, en color y en blanco, más favicon
 tools/                  scripts para volver a renderizar las imágenes
 ```
+
+## Marca
+
+- Colores del logo: azul marino `#131e3d`, azul `#186ae0` y azul profundo `#10449f`, sobre blanco. Están en las variables de `:root` en `css/styles.css`.
+- Tipografía de títulos: Poppins, la más parecida a la del logo. Texto: Instrument Sans.
+- Las versiones del logo en `assets/logo/` salen del logo original: las de color van sobre fondos claros y las `-blanco` sobre azul marino.
 
 ## Datos pendientes
 

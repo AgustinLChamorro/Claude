@@ -5,14 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>i2home | Domótica y automatización inteligente</title>
 <meta name="description" content="Diseñamos e instalamos sistemas de domótica a medida: iluminación, seguridad, clima, accesos, cortinas y riego, integrados en una sola app y sin atarte a una sola marca.">
-<meta name="theme-color" content="#0a1520">
+<meta name="theme-color" content="#131e3d">
 <meta property="og:type" content="website">
 <meta property="og:title" content="i2home | Domótica y automatización inteligente">
 <meta property="og:description" content="Tu casa, pensada para cuidarte a vos. Domótica a medida, multimarca y con soporte post-venta.">
 <meta property="og:image" content="assets/img/og.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wdth,wght@75..100,400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wdth,wght@75..100,400..700&family=Poppins:wght@400;500;600;700&display=swap">
+<link rel="icon" type="image/png" href="assets/logo/favicon.png">
+<link rel="apple-touch-icon" href="assets/logo/apple-touch-icon.png">
 <link rel="stylesheet" href="css/styles.css">
 <link rel="preload" as="image" href="assets/img/hero.webp">
 </head>
@@ -22,6 +24,7 @@
     <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.8.7 1.3 1.5 1.4 2.4h5c.1-.9.6-1.7 1.4-2.4A6 6 0 0 0 12 3z"/></symbol>
     <symbol id="i-thermo" viewBox="0 0 24 24"><path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0z"/><path d="M12 17.5v-5"/></symbol>
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.4-3 7.5-7 9-4-1.5-7-4.6-7-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="i-cam" viewBox="0 0 24 24"><rect x="3" y="7" width="12.5" height="10" rx="2.5"/><path d="M15.5 11l5.5-3v8l-5.5-3"/><circle cx="7" cy="10.5" r=".8"/></symbol>
     <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3M12 15v2"/></symbol>
     <symbol id="i-blinds" viewBox="0 0 24 24"><path d="M3 4h18M5 4v11M19 4v11M5 8h14M5 11.5h14M5 15h14M12 15v3"/><circle cx="12" cy="19.5" r="1.2"/></symbol>
     <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/><path d="M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5"/></symbol>
@@ -55,8 +58,7 @@
 <header class="site-header" id="header">
   <div class="wrap header-inner">
     <a class="brand" href="#inicio" aria-label="i2home, volver al inicio">
-      <span class="brand-mark" aria-hidden="true"><svg class="icon"><use href="#i-home"/></svg></span>
-      <span class="brand-word"><b>i2</b>home</span>
+      <img src="assets/logo/i2home-horizontal.png" width="1110" height="253" alt="i2home">
     </a>
     <nav class="nav" id="nav" aria-label="Principal">
       <a href="#servicios">Servicios</a>
@@ -66,7 +68,7 @@
       <a href="#preguntas">Preguntas</a>
       <a class="nav-cta" href="#contacto">Pedí tu presupuesto</a>
     </nav>
-    <a class="btn btn-amber btn-sm header-cta" href="#contacto">Pedí tu presupuesto</a>
+    <a class="btn btn-primary btn-sm header-cta" href="#contacto">Pedí tu presupuesto</a>
     <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">
       <svg class="icon icon-open"><use href="#i-menu"/></svg>
       <svg class="icon icon-close"><use href="#i-close"/></svg>
@@ -81,11 +83,11 @@
     <div class="hero-sky" aria-hidden="true"></div>
     <div class="wrap hero-grid">
       <div class="hero-copy">
-        <p class="eyebrow eyebrow-night"><span class="live-dot" aria-hidden="true"></span>Domótica y automatización inteligente</p>
-        <h1 id="hero-title">Tu casa, pensada para cuidarte a&nbsp;vos.</h1>
+        <p class="eyebrow eyebrow-night">Domótica y automatización inteligente</p>
+        <h1 id="hero-title">Tu casa, pensada para <em>cuidarte a&nbsp;vos.</em></h1>
         <p class="lead">Diseñamos e instalamos sistemas de domótica a medida: iluminación, seguridad, clima, accesos y más, todo integrado en una sola app y sin atarte a una sola marca.</p>
         <div class="hero-actions">
-          <a class="btn btn-amber" href="#contacto">Pedí tu presupuesto <svg class="icon"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn-primary" href="#contacto">Pedí tu presupuesto <svg class="icon"><use href="#i-arrow"/></svg></a>
           <a class="btn btn-ghost" href="#servicios">Ver qué hacemos</a>
         </div>
         <ul class="hero-trust">
@@ -282,7 +284,7 @@
           <span class="flow-icon"><svg class="icon"><use href="#i-sensor"/></svg></span>
           <h3>Dispositivos</h3>
           <p>Sensores e interruptores inteligentes en cada ambiente de tu casa.</p>
-          <p class="flow-meta">Shelly · SONOFF · ArgSeguridad</p>
+          <p class="flow-meta">Shelly · SONOFF · EZVIZ · Hikvision</p>
         </li>
         <li class="flow-node">
           <span class="flow-icon"><svg class="icon"><use href="#i-wifi"/></svg></span>
@@ -316,29 +318,41 @@
         </div>
         <p class="section-lead">No estamos atados a una sola marca: elegimos el dispositivo correcto para cada caso y lo integramos todo bajo un mismo sistema.</p>
       </div>
-      <div class="brands">
-        <article class="brand-card">
-          <span class="brand-icon" aria-hidden="true"><svg class="icon"><use href="#i-sensor"/></svg></span>
-          <p class="brand-name">Shelly</p>
-          <p>Relés, dimmers y medición de energía</p>
-        </article>
-        <article class="brand-card">
-          <span class="brand-icon" aria-hidden="true"><svg class="icon"><use href="#i-bulb"/></svg></span>
-          <p class="brand-name">SONOFF</p>
-          <p>Interruptores, sensores y paneles</p>
-        </article>
-        <article class="brand-card">
-          <span class="brand-icon" aria-hidden="true"><svg class="icon"><use href="#i-shield"/></svg></span>
-          <p class="brand-name">ArgSeguridad</p>
-          <p>Cámaras, alarmas y control de accesos</p>
-        </article>
+      <div class="brands-grid">
         <article class="brand-card brand-core">
+          <span class="brand-icon" aria-hidden="true"><svg class="icon"><use href="#i-hub"/></svg></span>
           <p class="brand-kicker">El cerebro</p>
           <p class="brand-name">Home Assistant</p>
-          <p>Conecta todos los dispositivos</p>
+          <p>Conecta todas las marcas en un mismo sistema y una sola app.</p>
           <ul class="tags tags-night"><li>Wi-Fi</li><li>Zigbee</li><li>Z-Wave</li><li>Matter</li></ul>
         </article>
+        <div class="brands">
+          <article class="brand-card">
+            <div class="brand-top"><span class="brand-icon" aria-hidden="true"><svg class="icon"><use href="#i-sensor"/></svg></span><span class="brand-cat">Automatización</span></div>
+            <p class="brand-name">Shelly</p>
+            <p>Relés, dimmers y medición de energía</p>
+          </article>
+          <article class="brand-card">
+            <div class="brand-top"><span class="brand-icon" aria-hidden="true"><svg class="icon"><use href="#i-bulb"/></svg></span><span class="brand-cat">Automatización</span></div>
+            <p class="brand-name">SONOFF</p>
+            <p>Interruptores, sensores y paneles</p>
+          </article>
+          <article class="brand-card">
+            <div class="brand-top"><span class="brand-icon" aria-hidden="true"><svg class="icon"><use href="#i-cam"/></svg></span><span class="brand-cat">Seguridad</span></div>
+            <p class="brand-name">EZVIZ</p>
+            <p>Cámaras Wi-Fi, timbres con video y cerraduras inteligentes</p>
+          </article>
+          <article class="brand-card">
+            <div class="brand-top"><span class="brand-icon" aria-hidden="true"><svg class="icon"><use href="#i-shield"/></svg></span><span class="brand-cat">Seguridad</span></div>
+            <p class="brand-name">Hikvision</p>
+            <p>Cámaras de seguridad, grabadores, alarmas y videoporteros</p>
+          </article>
+        </div>
       </div>
+      <ul class="also" aria-label="Otras marcas que integramos">
+        <li class="also-title">También integramos</li>
+        <li>Dahua</li><li>TP-Link Tapo</li><li>Aqara</li><li>Tuya / Smart Life</li><li>Philips Hue</li>
+      </ul>
       <ul class="compat">
         <li><svg class="icon"><use href="#i-check"/></svg>Compatible con Alexa</li>
         <li><svg class="icon"><use href="#i-check"/></svg>Compatible con Google Home</li>
@@ -354,7 +368,7 @@
       </figure>
       <div class="why-copy">
         <p class="eyebrow eyebrow-night">Nuestra propuesta</p>
-        <h2 id="nosotros-title">¿Por qué elegir i2home?</h2>
+        <h2 id="nosotros-title">¿Por qué elegir <em>i2home</em>?</h2>
         <ul class="reasons">
           <li>
             <span class="reason-icon"><svg class="icon"><use href="#i-sliders"/></svg></span>
@@ -461,7 +475,7 @@
     <div class="wrap cta-inner">
       <h2 id="cta-title">Armamos tu sistema, a medida de tu casa</h2>
       <p>Contanos qué necesitás y te ayudamos a diseñar el sistema justo para tu hogar.</p>
-      <a class="btn btn-amber" href="#contacto">Pedí tu presupuesto <svg class="icon"><use href="#i-arrow"/></svg></a>
+      <a class="btn btn-primary" href="#contacto">Pedí tu presupuesto <svg class="icon"><use href="#i-arrow"/></svg></a>
     </div>
   </section>
 
@@ -507,14 +521,14 @@
           <label for="f-mensaje">Contanos sobre tu proyecto</label>
           <textarea id="f-mensaje" name="mensaje" rows="4" placeholder="Ej.: casa de 3 ambientes, quiero empezar por la iluminación y las cámaras."></textarea>
         </div>
-        <button class="btn btn-amber btn-block" type="submit">Preparar mi consulta <svg class="icon"><use href="#i-arrow"/></svg></button>
+        <button class="btn btn-primary btn-block" type="submit">Preparar mi consulta <svg class="icon"><use href="#i-arrow"/></svg></button>
         <div class="form-result" id="form-result" hidden>
           <p class="form-result-title"><svg class="icon"><use href="#i-check"/></svg>Tu consulta está lista</p>
           <p>Enviala por WhatsApp o copiala para mandarla por mail.</p>
           <label class="sr-only" for="f-resultado">Mensaje preparado</label>
           <textarea id="f-resultado" rows="4" readonly></textarea>
           <div class="form-result-actions">
-            <a class="btn btn-amber btn-sm" id="wa-link" href="https://wa.me/" target="_blank" rel="noopener"><svg class="icon"><use href="#i-chat"/></svg>Abrir WhatsApp</a>
+            <a class="btn btn-primary btn-sm" id="wa-link" href="https://wa.me/" target="_blank" rel="noopener"><svg class="icon"><use href="#i-chat"/></svg>Abrir WhatsApp</a>
             <button class="btn btn-ghost-ink btn-sm" type="button" id="copy-btn"><svg class="icon"><use href="#i-copy"/></svg><span>Copiar mensaje</span></button>
           </div>
         </div>
@@ -527,10 +541,10 @@
   <div class="wrap footer-grid">
     <div class="footer-brand">
       <a class="brand" href="#inicio" aria-label="i2home, volver al inicio">
-        <span class="brand-mark" aria-hidden="true"><svg class="icon"><use href="#i-home"/></svg></span>
-        <span class="brand-word"><b>i2</b>home</span>
+        <img src="assets/logo/i2home-horizontal-blanco.png" width="1110" height="253" alt="i2home">
       </a>
-      <p>Domótica y automatización inteligente para tu casa, a medida y sin ataduras de marca.</p>
+      <p class="footer-tagline">Domótica y automatización inteligente</p>
+      <p>Sistemas a medida para tu casa, sin ataduras de marca.</p>
     </div>
     <nav aria-label="Secciones">
       <p class="footer-title">Sitio</p>

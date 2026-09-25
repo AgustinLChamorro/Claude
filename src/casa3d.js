@@ -12,7 +12,7 @@ const H = 2.6; // altura de muros completos
 const L = 1.0; // altura de muros cortados
 
 const WARM = 0xffb877;
-const TEAL = 0x6fd3c1;
+const TEAL = 0x5fc4ff; // estados activos, en la familia de azules de la marca
 
 export const DEVICES = ['luces', 'cortinas', 'clima', 'accesos', 'alarma', 'riego'];
 
@@ -161,9 +161,9 @@ function skyTexture() {
   c.width = 32; c.height = 512;
   const g = c.getContext('2d');
   const grd = g.createLinearGradient(0, 0, 0, 512);
-  grd.addColorStop(0, '#0a1622');
-  grd.addColorStop(0.55, '#12263a');
-  grd.addColorStop(1, '#1c3550');
+  grd.addColorStop(0, '#0b1330');
+  grd.addColorStop(0.55, '#131e3d');
+  grd.addColorStop(1, '#1d2d5c');
   g.fillStyle = grd;
   g.fillRect(0, 0, 32, 512);
   const t = new THREE.CanvasTexture(c);
@@ -501,7 +501,7 @@ export function createCasa(canvas, options = {}) {
   const airPos = new Float32Array(airCount * 3);
   const airSeed = Array.from({ length: airCount }, () => [rnd(), rnd(), rnd()]);
   airGeo.setAttribute('position', new THREE.BufferAttribute(airPos, 3));
-  const airMat = new THREE.PointsMaterial({ color: 0xa8efe4, map: tex.glow, size: 3, sizeAttenuation: false, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+  const airMat = new THREE.PointsMaterial({ color: 0xa9dcff, map: tex.glow, size: 3, sizeAttenuation: false, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
   const air = new THREE.Points(airGeo, airMat);
   air.frustumCulled = false;
   root.add(air);
@@ -565,8 +565,8 @@ export function createCasa(canvas, options = {}) {
   doorPivot.add(lockLed);
   root.add(doorPivot);
   // panel táctil de la casa, junto a la puerta (lado interior)
-  const panel = lamp('accesos', [1.3, F + 1.25, 3.2], 0x9fe6da, 0.3, 1.2);
-  bx(1.22, 1.38, F + 1.16, F + 1.34, 3.405, 3.42, emissiveMat('#0c1216', 0x9fe6da, 1.6, panel), false);
+  const panel = lamp('accesos', [1.3, F + 1.25, 3.2], 0x8fc2ff, 0.3, 1.2);
+  bx(1.22, 1.38, F + 1.16, F + 1.34, 3.405, 3.42, emissiveMat('#0c1216', 0x8fc2ff, 1.6, panel), false);
   // umbral, alero y aplique exterior
   bx(-0.25, 1.45, 0, F, 3.58, 4.0, M.stone);
   bx(-0.4, 1.6, F + 2.28, F + 2.36, 3.42, 4.32, M.cap);

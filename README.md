@@ -2,14 +2,20 @@
 
 Sitio de una sola página para i2home (domótica y automatización inteligente). Es HTML, CSS y JavaScript estático: se puede subir tal cual a Netlify, Vercel, GitHub Pages o cualquier hosting.
 
-En el inicio hay una casa en 3D, de noche, que el visitante puede controlar: luces, clima, cortinas, puerta, alarma y riego, más dos escenas ("Llegué a casa" y "Buenas noches"). Las imágenes de cada servicio salen de la misma escena 3D, así todo el sitio mantiene el mismo estilo.
+La misma casa en 3D aparece en tres partes interactivas:
+
+- **Inicio:** el visitante prende y apaga luces, clima, cortinas, puerta, alarma y riego, o activa las escenas "Llegué a casa" y "Buenas noches".
+- **Un día con i2home:** una barra de horario (o el botón Reproducir) recorre las 24 horas. Cambian el cielo y la luz del sol, se disparan las automatizaciones (riego, "Me voy de casa", "Llegué a casa", atardecer, "Buenas noches") y quedan anotadas en el registro de la casa.
+- **Armá tu casa:** el visitante elige ambientes y dispositivos, la cámara se acerca a cada ambiente y se ve cada equipo encendido. La selección se manda por WhatsApp o pasa al formulario de contacto con los intereses ya marcados.
+
+Las imágenes de los servicios también salen de esa escena.
 
 ## Estructura
 
 ```
 index.html              la página
 css/styles.css          estilos (colores y tipografías en las variables de :root)
-js/main.js              menú, casa interactiva, formulario y botón de WhatsApp
+js/main.js              menú, casa del inicio, simulador del día, configurador, formulario y WhatsApp
 js/casa3d.js            escena 3D compilada (no editar a mano: se genera desde src/)
 src/casa3d.js           código fuente de la escena 3D (three.js)
 assets/img/             imágenes del sitio (WebP) e imagen para redes (og.jpg)
@@ -40,6 +46,23 @@ El formulario no necesita servidor: arma el mensaje con los datos que carga la p
 npm install
 npm run dev        # abre http://localhost:8080
 ```
+
+## Fotos reales
+
+Hoy las imágenes de los servicios son renders de la casa 3D. Para reemplazarlas por fotos, guardá cada una en `assets/img/` con el mismo nombre (WebP u otro formato, cambiando la extensión en `index.html`), en horizontal 4:3 y con al menos 1200 px de ancho:
+
+| Archivo | Qué debería mostrar |
+| --- | --- |
+| `iluminacion.webp` | Living de noche con luces cálidas, tiras LED o dimmers |
+| `clima.webp` | Dormitorio o living con split, o una mano con el celular ajustando la temperatura |
+| `seguridad.webp` | Cámara de seguridad instalada en una fachada |
+| `accesos.webp` | Cerradura inteligente o videoportero en una puerta de entrada |
+| `cortinas.webp` | Ventanal con cortina roller o persiana motorizada |
+| `riego.webp` | Jardín con aspersores regando |
+| `cocina.webp` | Cocina moderna iluminada (sección "¿Por qué elegir i2home?") |
+| `amplia.webp` | Casa de noche con las ventanas encendidas (banda final, formato 2:1) |
+
+Las fotos de trabajos propios son las que más confianza generan. Si se usan fotos de bancos de imágenes, conviene elegir las de licencia libre para uso comercial (por ejemplo Unsplash o Pexels) y no las marcadas como premium.
 
 ## Cambiar la escena 3D o las imágenes
 

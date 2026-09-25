@@ -15,7 +15,7 @@ export const SHOTS = [
   { name: 'accesos', preset: 'accesos', on: 'luces,accesos', w: 1200, h: 900 },
   { name: 'cortinas', preset: 'cortinas', on: 'luces,cortinas:0.62', w: 1200, h: 900 },
   { name: 'riego', preset: 'riego', on: 'luces,riego', w: 1200, h: 900, t: 3.1 },
-  { name: 'cocina', preset: 'cocina', on: 'luces', w: 1200, h: 900 },
+  { name: 'cocina', preset: 'cocinaFoto', on: 'luces', w: 1200, h: 900 },
   { name: 'amplia', preset: 'amplia', on: 'luces,clima', w: 1800, h: 900 },
   { name: 'plano', preset: 'plano', on: 'luces', w: 1400, h: 1200, bg: 0 },
 ];

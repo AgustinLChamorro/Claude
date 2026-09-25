@@ -25,6 +25,12 @@
     <symbol id="i-thermo" viewBox="0 0 24 24"><path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0z"/><path d="M12 17.5v-5"/></symbol>
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.4-3 7.5-7 9-4-1.5-7-4.6-7-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
     <symbol id="i-cam" viewBox="0 0 24 24"><rect x="3" y="7" width="12.5" height="10" rx="2.5"/><path d="M15.5 11l5.5-3v8l-5.5-3"/><circle cx="7" cy="10.5" r=".8"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8.5 5.5v13M15.5 5.5v13"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
+    <symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21a6.5 6.5 0 0 0 6.5-6.5c0-4.5-4.2-7-5-11.5-2.8 2.3-3.4 5.2-3 7.2-1.2-.6-2-1.9-2.2-3.2C6.9 8.6 5.5 11 5.5 14.5A6.5 6.5 0 0 0 12 21z"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="3"/><circle cx="12" cy="8" r="2"/><circle cx="12" cy="15.5" r="1.8"/></symbol>
     <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3M12 15v2"/></symbol>
     <symbol id="i-blinds" viewBox="0 0 24 24"><path d="M3 4h18M5 4v11M19 4v11M5 8h14M5 11.5h14M5 15h14M12 15v3"/><circle cx="12" cy="19.5" r="1.2"/></symbol>
     <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/><path d="M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5"/></symbol>
@@ -62,8 +68,8 @@
     </a>
     <nav class="nav" id="nav" aria-label="Principal">
       <a href="#servicios">Servicios</a>
-      <a href="#escenas">Escenas</a>
-      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#un-dia">Un día</a>
+      <a href="#arma-tu-casa">Armá tu casa</a>
       <a href="#marcas">Marcas</a>
       <a href="#preguntas">Preguntas</a>
       <a class="nav-cta" href="#contacto">Pedí tu presupuesto</a>
@@ -210,39 +216,55 @@
     </div>
   </section>
 
-  <!-- Escenas -->
-  <section class="section dark scenes-section" id="escenas" aria-labelledby="escenas-title">
+  <!-- Un día con i2home: simulador -->
+  <section class="section dark day-section" id="un-dia" aria-labelledby="dia-title">
     <div class="plan-bg" aria-hidden="true"></div>
     <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow eyebrow-night">Escenas y automatizaciones</p>
-        <h2 id="escenas-title">Un toque, y la casa hace el resto</h2>
-        <p class="section-lead">Cada automatización tiene tres partes: qué la dispara, en qué condiciones corre y qué hace. Estos son algunos ejemplos que podemos dejar configurados en tu casa.</p>
+      <div class="section-head section-head-split">
+        <div>
+          <p class="eyebrow eyebrow-night">Escenas y automatizaciones</p>
+          <h2 id="dia-title">Un día en una casa <em>que se adelanta</em></h2>
+        </div>
+        <p class="section-lead">Mové la hora o tocá reproducir: vas a ver cómo la casa responde a cada momento del día sin que nadie toque nada.</p>
       </div>
+
+      <div class="day">
+        <div class="day-stage" id="day-stage">
+          <div class="day-sky" id="day-sky" aria-hidden="true">
+            <span class="day-stars"></span>
+            <span class="day-orb" id="day-orb"></span>
+          </div>
+          <div class="stage stage-day" id="day-canvas-wrap">
+            <img class="stage-poster" src="assets/img/hero.webp" width="1400" height="1050" alt="" aria-hidden="true">
+            <canvas id="casa-dia" aria-hidden="true"></canvas>
+            <div class="stage-labels" id="day-labels" aria-hidden="true"></div>
+          </div>
+        </div>
+
+        <div class="day-panel">
+          <div class="day-clock">
+            <p class="day-time" id="day-time">19:45</p>
+            <p class="day-phase" id="day-phase">Atardecer</p>
+            <button class="play-btn" type="button" id="day-play" aria-pressed="false">
+              <svg class="icon icon-play"><use href="#i-play"/></svg>
+              <svg class="icon icon-pause"><use href="#i-pause"/></svg>
+              <span>Reproducir el día</span>
+            </button>
+          </div>
+          <div class="day-range">
+            <label class="sr-only" for="day-slider">Hora del día</label>
+            <input type="range" id="day-slider" min="0" max="1439" step="5" value="1185">
+            <div class="day-ticks" id="day-ticks" aria-hidden="true"></div>
+            <div class="day-hours" aria-hidden="true"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
+          </div>
+          <div class="logbook">
+            <p class="logbook-title">Registro de la casa</p>
+            <ol class="logbook-list" id="logbook" aria-live="polite"></ol>
+          </div>
+        </div>
+      </div>
+
       <div class="automations">
-        <article class="auto">
-          <header class="auto-head">
-            <span class="auto-icon"><svg class="icon"><use href="#i-door"/></svg></span>
-            <h3>Llegué a casa</h3>
-            <span class="switch" aria-hidden="true"></span>
-          </header>
-          <dl class="auto-flow">
-            <div><dt>Cuando</dt><dd>Se abre la cerradura de la puerta principal</dd></div>
-            <div><dt>Y si</dt><dd>Ya se puso el sol</dd></div>
-            <div><dt>Entonces</dt><dd><ul><li>Entrada y living se encienden al 70&nbsp;%</li><li>Se desactiva la alarma</li><li>El aire se pone en 22&nbsp;°C</li></ul></dd></div>
-          </dl>
-        </article>
-        <article class="auto">
-          <header class="auto-head">
-            <span class="auto-icon"><svg class="icon"><use href="#i-moon"/></svg></span>
-            <h3>Buenas noches</h3>
-            <span class="switch" aria-hidden="true"></span>
-          </header>
-          <dl class="auto-flow">
-            <div><dt>Cuando</dt><dd>Decís «Alexa, buenas noches» o tocás el botón junto a la cama</dd></div>
-            <div><dt>Entonces</dt><dd><ul><li>Se apagan todas las luces</li><li>Bajan las cortinas</li><li>Se activa la alarma perimetral</li><li>La puerta queda con llave</li></ul></dd></div>
-          </dl>
-        </article>
         <article class="auto">
           <header class="auto-head">
             <span class="auto-icon"><svg class="icon"><use href="#i-drop"/></svg></span>
@@ -252,20 +274,47 @@
           <dl class="auto-flow">
             <div><dt>Cuando</dt><dd>Son las 06:30</dd></div>
             <div><dt>Y si</dt><dd>No llovió en las últimas 24 horas</dd></div>
-            <div><dt>Entonces</dt><dd><ul><li>Riega el jardín por zonas, 10 minutos cada una</li><li>Te avisa al celular cuando termina</li></ul></dd></div>
+            <div><dt>Entonces</dt><dd><ul><li>Riega el jardín por zonas</li><li>Te avisa al celular cuando termina</li></ul></dd></div>
           </dl>
+          <button class="auto-try" type="button" data-time="390">Ver a las 06:30 <svg class="icon"><use href="#i-arrow"/></svg></button>
         </article>
         <article class="auto">
           <header class="auto-head">
-            <span class="auto-icon"><svg class="icon"><use href="#i-suitcase"/></svg></span>
-            <h3>Me fui de vacaciones</h3>
+            <span class="auto-icon"><svg class="icon"><use href="#i-lock"/></svg></span>
+            <h3>Me voy de casa</h3>
             <span class="switch" aria-hidden="true"></span>
           </header>
           <dl class="auto-flow">
-            <div><dt>Cuando</dt><dd>Anochece</dd></div>
-            <div><dt>Y si</dt><dd>El modo vacaciones está activo</dd></div>
-            <div><dt>Entonces</dt><dd><ul><li>Luces que se prenden y apagan en distintos ambientes</li><li>Cortinas que suben y bajan en horarios normales</li><li>Cámaras grabando y avisos al celular</li></ul></dd></div>
+            <div><dt>Cuando</dt><dd>Cerrás la puerta con llave al salir</dd></div>
+            <div><dt>Y si</dt><dd>No queda nadie en casa</dd></div>
+            <div><dt>Entonces</dt><dd><ul><li>Se apagan todas las luces y el aire</li><li>Se activa la alarma</li></ul></dd></div>
           </dl>
+          <button class="auto-try" type="button" data-time="495">Ver a las 08:15 <svg class="icon"><use href="#i-arrow"/></svg></button>
+        </article>
+        <article class="auto">
+          <header class="auto-head">
+            <span class="auto-icon"><svg class="icon"><use href="#i-door"/></svg></span>
+            <h3>Llegué a casa</h3>
+            <span class="switch" aria-hidden="true"></span>
+          </header>
+          <dl class="auto-flow">
+            <div><dt>Cuando</dt><dd>Se abre la cerradura de la puerta principal</dd></div>
+            <div><dt>Y si</dt><dd>La alarma estaba activada</dd></div>
+            <div><dt>Entonces</dt><dd><ul><li>Se desactiva la alarma</li><li>Se prende la luz de entrada</li></ul></dd></div>
+          </dl>
+          <button class="auto-try" type="button" data-time="1110">Ver a las 18:30 <svg class="icon"><use href="#i-arrow"/></svg></button>
+        </article>
+        <article class="auto">
+          <header class="auto-head">
+            <span class="auto-icon"><svg class="icon"><use href="#i-moon"/></svg></span>
+            <h3>Buenas noches</h3>
+            <span class="switch" aria-hidden="true"></span>
+          </header>
+          <dl class="auto-flow">
+            <div><dt>Cuando</dt><dd>Decís «Alexa, buenas noches» o tocás el botón junto a la cama</dd></div>
+            <div><dt>Entonces</dt><dd><ul><li>Se apagan las luces y bajan las cortinas</li><li>La puerta queda con llave y se activa la alarma perimetral</li></ul></dd></div>
+          </dl>
+          <button class="auto-try" type="button" data-time="1410">Ver a las 23:30 <svg class="icon"><use href="#i-arrow"/></svg></button>
         </article>
       </div>
     </div>
@@ -305,6 +354,62 @@
           <p class="flow-meta">App · Alexa · Google Home</p>
         </li>
       </ol>
+    </div>
+  </section>
+
+  <!-- Armá tu casa: configurador -->
+  <section class="section light builder-section" id="arma-tu-casa" aria-labelledby="builder-title">
+    <div class="wrap">
+      <div class="section-head section-head-split">
+        <div>
+          <p class="eyebrow">Armá tu casa inteligente</p>
+          <h2 id="builder-title">Elegí qué querés automatizar, <em>ambiente por ambiente</em></h2>
+        </div>
+        <p class="section-lead">Tocá un ambiente y marcá lo que te gustaría tener. Con tu selección te armamos un presupuesto a medida y sin cargo.</p>
+      </div>
+
+      <div class="builder">
+        <div class="builder-stage">
+          <div class="stage stage-builder" id="builder-canvas-wrap">
+            <img class="stage-poster" src="assets/img/hero.webp" width="1400" height="1050" alt="" aria-hidden="true">
+            <canvas id="casa-builder" aria-hidden="true"></canvas>
+            <div class="hotspots" id="hotspots"></div>
+          </div>
+          <button class="btn btn-ghost btn-sm builder-reset" type="button" id="builder-overview">
+            <svg class="icon"><use href="#i-home"/></svg>Ver toda la casa
+          </button>
+        </div>
+
+        <div class="builder-panel">
+          <div class="builder-presets">
+            <p class="builder-label">Empezá con una idea</p>
+            <div class="preset-row">
+              <button class="preset-btn" type="button" data-preset="seguridad"><svg class="icon"><use href="#i-shield"/></svg>Seguridad</button>
+              <button class="preset-btn" type="button" data-preset="confort"><svg class="icon"><use href="#i-thermo"/></svg>Confort</button>
+              <button class="preset-btn" type="button" data-preset="completa"><svg class="icon"><use href="#i-home"/></svg>Casa completa</button>
+              <button class="preset-btn preset-clear" type="button" data-preset="limpiar">Limpiar</button>
+            </div>
+          </div>
+
+          <div>
+            <p class="builder-label" id="rooms-label">Ambiente</p>
+            <div class="room-tabs" role="group" aria-labelledby="rooms-label" id="room-tabs"></div>
+          </div>
+
+          <fieldset class="options" id="options">
+            <legend class="sr-only" id="options-legend">Dispositivos</legend>
+          </fieldset>
+
+          <div class="builder-summary">
+            <p class="summary-count" id="summary-count" aria-live="polite">Todavía no elegiste dispositivos</p>
+            <ul class="summary-list" id="summary-list"></ul>
+            <div class="summary-actions">
+              <button class="btn btn-primary btn-sm" type="button" id="builder-to-form">Pedir presupuesto con esto <svg class="icon"><use href="#i-arrow"/></svg></button>
+              <a class="btn btn-ghost-ink btn-sm" id="builder-wa" href="https://wa.me/" target="_blank" rel="noopener"><svg class="icon"><use href="#i-chat"/></svg>Enviar por WhatsApp</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -550,7 +655,8 @@
       <p class="footer-title">Sitio</p>
       <ul>
         <li><a href="#servicios">Servicios</a></li>
-        <li><a href="#escenas">Escenas</a></li>
+        <li><a href="#un-dia">Un día con i2home</a></li>
+        <li><a href="#arma-tu-casa">Armá tu casa</a></li>
         <li><a href="#como-funciona">Cómo funciona</a></li>
         <li><a href="#nosotros">Nosotros</a></li>
         <li><a href="#preguntas">Preguntas</a></li>

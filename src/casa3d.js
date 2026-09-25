@@ -1,6 +1,6 @@
-// Casa i2home: diorama 3D de una casa de noche, con dispositivos que se
-// encienden y apagan. Se usa en vivo en el inicio del sitio y también para
-// renderizar las imágenes fijas de cada servicio (tools/render-stills.mjs).
+// Casa i2home: diorama 3D de una casa, con dispositivos que se encienden y
+// apagan por ambiente, hora del día y cámara que recorre la casa. Se usa en
+// vivo en el sitio y para renderizar las imágenes fijas (tools/render-stills.mjs).
 
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
@@ -14,20 +14,65 @@ const L = 1.0; // altura de muros cortados
 const WARM = 0xffb877;
 const TEAL = 0x5fc4ff; // estados activos, en la familia de azules de la marca
 
-export const DEVICES = ['luces', 'cortinas', 'clima', 'accesos', 'alarma', 'riego'];
+// Cada canal es un dispositivo de la casa. Los valores van de 0 a 1.
+export const CHANNELS = [
+  'luzLiving', 'luzDormitorio', 'luzCocina', 'luzEntrada', 'luzExterior', 'luzPileta',
+  'cortinaLiving', 'cortinaDormitorio', 'climaLiving', 'climaDormitorio',
+  'puerta', 'cerradura', 'videoportero', 'alarma', 'riego',
+  'sensorPresencia', 'sensorApertura', 'sensorGas', 'sensorAgua', 'enchufes', 'botonNoche',
+];
+
+// Grupos que usa el inicio del sitio (un botón maneja varios canales).
+export const ALIASES = {
+  luces: ['luzLiving', 'luzDormitorio', 'luzCocina', 'luzEntrada', 'luzExterior', 'luzPileta'],
+  cortinas: ['cortinaLiving', 'cortinaDormitorio'],
+  clima: ['climaLiving', 'climaDormitorio'],
+  accesos: ['puerta'],
+  alarma: ['alarma'],
+  riego: ['riego'],
+};
+export const DEVICES = Object.keys(ALIASES);
+
+export const ROOMS = ['living', 'dormitorio', 'cocina', 'entrada', 'exterior'];
+
+const HERO_POINTS = [];
+for (const x of [-6.7, 8.7]) for (const z of [-5.4, 7.4]) for (const y of [-0.8, 0]) HERO_POINTS.push([x, y, z]);
+HERO_POINTS.push([0.6, 3.1, 3.9], [-5.4, 3.0, 5.9], [-5, 3.1, -3.5], [7.9, 2.9, -4.5]);
+
+const box = (x0, x1, y0, y1, z0, z1) => {
+  const pts = [];
+  for (const x of [x0, x1]) for (const y of [y0, y1]) for (const z of [z0, z1]) pts.push([x, y, z]);
+  return pts;
+};
 
 export const PRESETS = {
-  hero: { type: 'ortho', az: 34, el: 36, target: [1.2, 0.2, 1.2], margin: 1.06 },
-  plano: { type: 'ortho', az: 0, el: 89.9, target: [1, 0, 1], margin: 1.0 },
+  hero: { type: 'ortho', az: 34, el: 36, target: [1.2, 0.2, 1.2], margin: 1.06, points: HERO_POINTS },
+  dia: { type: 'ortho', az: 30, el: 38, target: [1.2, 0.2, 1.2], margin: 1.04, points: HERO_POINTS },
+  living: { type: 'ortho', az: 40, el: 48, target: [-2.5, 0.8, 0], margin: 1.12, points: box(-5.2, 0.3, 0, 2.7, -3.7, 3.7) },
+  dormitorio: { type: 'ortho', az: 28, el: 44, target: [2.5, 0.8, -1.8], margin: 1.15, points: box(-0.2, 5.2, 0, 2.7, -3.7, 0.2) },
+  cocina: { type: 'ortho', az: 36, el: 48, target: [3.1, 0.6, 1.8], margin: 1.2, points: box(1.0, 5.2, 0, 2.2, -0.2, 3.8) },
+  entrada: { type: 'ortho', az: 20, el: 30, target: [0.6, 1.1, 3.6], margin: 1.2, points: box(-1.2, 2.4, 0, 2.7, 2.2, 5.2) },
+  exterior: { type: 'ortho', az: 34, el: 36, target: [1.2, 0.2, 1.2], margin: 1.02, points: HERO_POINTS },
+  plano: { type: 'ortho', az: 0, el: 89.9, target: [1, 0, 1], margin: 1.0, points: HERO_POINTS },
   amplia: { type: 'persp', pos: [10.5, 3.6, 12.5], target: [0.4, 0.9, 0.8], fov: 36 },
   iluminacion: { type: 'persp', pos: [0.9, 2.7, 2.9], target: [-3.4, 0.9, -1.1], fov: 52 },
   clima: { type: 'persp', pos: [2.6, 2.3, 1.9], target: [2.0, 1.3, -3.2], fov: 44 },
   seguridad: { type: 'persp', pos: [8.5, 3.6, 10.5], target: [3.2, 0.8, 4.2], fov: 36 },
   accesos: { type: 'persp', pos: [3.4, 1.9, 7.6], target: [0.5, 1.1, 3.6], fov: 36 },
   cortinas: { type: 'persp', pos: [-1.2, 2.2, 1.6], target: [-3.0, 1.4, -3.4], fov: 46 },
-  cocina: { type: 'persp', pos: [4.1, 2.15, 3.35], target: [1.6, 0.95, 0.9], fov: 50 },
+  cocinaFoto: { type: 'persp', pos: [4.1, 2.15, 3.35], target: [1.6, 0.95, 0.9], fov: 50 },
   riego: { type: 'persp', pos: [-0.4, 1.5, 7.8], target: [-3.2, 0.5, 4.6], fov: 48 },
 };
+
+// Salida y puesta del sol (minutos desde las 00:00), primavera en Buenos Aires.
+export const SUNRISE = 6 * 60 + 50;
+export const SUNSET = 19 * 60 + 10;
+
+const smooth = (a, b, x) => {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+};
+const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 // Generador pseudoaleatorio con semilla: la casa sale siempre igual.
 function seeded(a) {
@@ -153,7 +198,13 @@ function makeTextures() {
     g.fillStyle = grd;
     g.fillRect(0, 0, s, s);
   });
-  return { wood, tile, grass, rug, rugBlue, water, glow, blob };
+  const ring = canvasTexture(128, (g, s) => {
+    g.strokeStyle = 'rgba(255,255,255,1)';
+    g.lineWidth = 7;
+    g.beginPath(); g.arc(s / 2, s / 2, s / 2 - 8, 0, Math.PI * 2); g.stroke();
+  });
+  ring.colorSpace = THREE.NoColorSpace;
+  return { wood, tile, grass, rug, rugBlue, water, glow, blob, ring };
 }
 
 function skyTexture() {
@@ -299,14 +350,14 @@ export function createCasa(canvas, options = {}) {
     }
   }
 
-  // ---------- luces agrupadas por dispositivo ----------
-  const lamps = { luces: [], clima: [], alarma: [], accesos: [] };
-  function lamp(group, pos, color, intensity, distance = 6) {
+  // ---------- luces y efectos, por canal ----------
+  const lamps = Object.fromEntries(CHANNELS.map((c) => [c, []]));
+  function lamp(channel, pos, color, intensity, distance = 6) {
     const light = new THREE.PointLight(color, 0, distance, 2);
     light.position.set(...pos);
     root.add(light);
     const entry = { light, base: intensity, mats: [], sprites: [] };
-    lamps[group].push(entry);
+    lamps[channel].push(entry);
     return entry;
   }
   function glowMat(color) {
@@ -330,18 +381,20 @@ export function createCasa(canvas, options = {}) {
     for (const { s, base } of entry.sprites) s.material.opacity = base * v;
   }
 
-  // ---------- ambiente de noche ----------
-  scene.add(new THREE.HemisphereLight(0x4a6a8f, 0x0e141a, 0.9));
-  const moon = new THREE.DirectionalLight(0xa8bcff, 1.1);
-  moon.position.set(-7, 14, 9);
-  moon.target.position.set(1, 0, 1);
-  moon.castShadow = true;
-  moon.shadow.mapSize.set(opts.shadowSize, opts.shadowSize);
-  Object.assign(moon.shadow.camera, { left: -11, right: 11, top: 11, bottom: -11, near: 1, far: 40 });
-  moon.shadow.bias = -0.0004;
-  moon.shadow.normalBias = 0.03;
-  moon.shadow.radius = 3;
-  scene.add(moon, moon.target);
+  // ---------- luz ambiente: luna de noche, sol de día ----------
+  const hemi = new THREE.HemisphereLight(0x4a6a8f, 0x0e141a, 0.9);
+  scene.add(hemi);
+  const keyLight = new THREE.DirectionalLight(0xa8bcff, 1.1);
+  const MOON_POS = new THREE.Vector3(-7, 14, 9);
+  keyLight.position.copy(MOON_POS);
+  keyLight.target.position.set(1, 0, 1);
+  keyLight.castShadow = true;
+  keyLight.shadow.mapSize.set(opts.shadowSize, opts.shadowSize);
+  Object.assign(keyLight.shadow.camera, { left: -11, right: 11, top: 11, bottom: -11, near: 1, far: 50 });
+  keyLight.shadow.bias = -0.0004;
+  keyLight.shadow.normalBias = 0.03;
+  keyLight.shadow.radius = 3;
+  scene.add(keyLight, keyLight.target);
 
   // ---------- terreno ----------
   const plinth = new THREE.Mesh(new RoundedBoxGeometry(15.4, 0.8, 12.8, 4, 0.14), M.plinth);
@@ -371,9 +424,9 @@ export function createCasa(canvas, options = {}) {
   wall('z', -3.5, 0, 0, L);
   wall('x', 0, 5, 0, L, [{ s: 0.2, e: 1.05, y0: 0, y1: L }]);
 
-  // ventanas: vidrio, marcos, cortinas
+  // ventanas: vidrio, marcos, cortinas roller
   const blinds = [];
-  function windowOn(win, mullions) {
+  function windowOn(win, mullions, channel) {
     const zi = -3.5;
     bx(win.s, win.e, F + win.y0, F + win.y1, zi - 0.01, zi + 0.01, M.glass, false);
     const fr = 0.035;
@@ -385,7 +438,6 @@ export function createCasa(canvas, options = {}) {
       const x = win.s + ((win.e - win.s) * i) / (mullions + 1);
       bx(x - fr / 2, x + fr / 2, F + win.y0, F + win.y1, zi - 0.04, zi + 0.04, M.frame);
     }
-    // cortina roller: cassette + paño que baja desde arriba
     const zc = zi + T / 2 + 0.05;
     bx(win.s - 0.06, win.e + 0.06, F + win.y1 + 0.02, F + win.y1 + 0.12, zc - 0.05, zc + 0.05, M.white);
     const hgt = win.y1 - win.y0 + 0.04;
@@ -400,13 +452,12 @@ export function createCasa(canvas, options = {}) {
     bar.position.y = -hgt;
     pivot.add(bar);
     root.add(pivot);
-    blinds.push({ pivot, panel, bar, hgt });
+    blinds.push({ panel, bar, hgt, channel });
   }
-  windowOn(LIVING_WIN, 2);
-  windowOn(BED_WIN, 0);
+  windowOn(LIVING_WIN, 2, 'cortinaLiving');
+  windowOn(BED_WIN, 0, 'cortinaDormitorio');
 
   // ---------- living ----------
-  // revestimiento de listones y TV sobre el muro izquierdo
   const slatGeo = new THREE.BoxGeometry(0.03, 2.3, 0.045);
   const slats = new THREE.InstancedMesh(slatGeo, M.oak, 42);
   const dummy = new THREE.Object3D();
@@ -419,9 +470,8 @@ export function createCasa(canvas, options = {}) {
   root.add(slats);
   bx(-4.89, -4.45, F + 0.08, F + 0.48, -1.1, 1.9, M.walnut);
   bx(-4.88, -4.84, F + 1.0, F + 1.74, -0.4, 1.1, M.tv);
-  rb(0.08, 0.34, 0.08, 0.02, M.black, -4.62, F + 0.48, 1.55); // parlante
+  rb(0.08, 0.34, 0.08, 0.02, M.black, -4.62, F + 0.48, 1.55);
 
-  // alfombra, sofá, mesa
   bx(-4.1, -1.25, F, F + 0.012, -1.15, 1.95, M.rug, false);
   rb(0.98, 0.3, 2.7, 0.06, M.fabric, -1.55, F + 0.06, 0.3);
   rb(0.74, 0.14, 1.3, 0.06, M.fabric, -1.66, F + 0.34, -0.35);
@@ -434,11 +484,9 @@ export function createCasa(canvas, options = {}) {
   cyl(0.46, 0.46, 0.04, M.oak, -2.95, F + 0.34, 0.35, 40);
   cyl(0.06, 0.2, 0.34, M.walnut, -2.95, F, 0.35);
   rb(0.28, 0.05, 0.2, 0.01, M.mustard, -2.85, F + 0.38, 0.25);
-  // sillón junto a la ventana
   rb(0.8, 0.36, 0.8, 0.08, M.fabricLight, -3.6, F + 0.08, -2.45).rotation.y = 0.5;
   rb(0.8, 0.5, 0.18, 0.07, M.fabricLight, -3.82, F + 0.4, -2.78).rotation.y = 0.5;
 
-  // planta en la esquina
   function plant(x, z, s = 1) {
     cyl(0.2 * s, 0.15 * s, 0.4 * s, M.pot, x, F, z);
     for (let i = 0; i < 4; i++) {
@@ -450,23 +498,20 @@ export function createCasa(canvas, options = {}) {
   plant(-4.55, -3.05, 1.1);
   plant(4.55, -0.55, 0.9);
 
-  // lámpara de pie del living
-  const floorLamp = lamp('luces', [-1.2, F + 1.35, -1.45], WARM, 7, 7);
+  const floorLamp = lamp('luzLiving', [-1.2, F + 1.35, -1.45], WARM, 7, 7);
   cyl(0.15, 0.15, 0.03, M.black, -1.2, F, -1.45);
   cyl(0.012, 0.012, 1.3, M.black, -1.2, F, -1.45);
   cyl(0.17, 0.21, 0.3, emissiveMat('#f3e3c8', WARM, 2.2, floorLamp), -1.2, F + 1.25, -1.45);
   addGlow(floorLamp, [-1.2, F + 1.4, -1.45], 1.6, WARM, 0.55);
 
-  // mesa auxiliar con velador
-  const sideLamp = lamp('luces', [-1.5, F + 0.95, 2.15], WARM, 3.5, 5);
+  const sideLamp = lamp('luzLiving', [-1.5, F + 0.95, 2.15], WARM, 3.5, 5);
   cyl(0.2, 0.2, 0.5, M.oak, -1.5, F, 2.15);
   cyl(0.05, 0.07, 0.2, M.black, -1.5, F + 0.5, 2.15);
   cyl(0.11, 0.14, 0.18, emissiveMat('#f3e3c8', WARM, 2.2, sideLamp), -1.5, F + 0.7, 2.15);
   addGlow(sideLamp, [-1.5, F + 0.8, 2.15], 1.0, WARM, 0.5);
 
-  // luz de cortesía (tira LED) en lo alto del muro trasero e izquierdo
-  const cove = lamp('luces', [-3.2, F + 2.2, -3.05], WARM, 5, 6);
-  const cove2 = lamp('luces', [-4.55, F + 2.2, 0.4], WARM, 4, 6);
+  const cove = lamp('luzLiving', [-3.2, F + 2.2, -3.05], WARM, 5, 6);
+  lamp('luzLiving', [-4.55, F + 2.2, 0.4], WARM, 4, 6);
   const coveMat = emissiveMat('#fff3e0', WARM, 3, cove);
   bx(-4.92, -0.1, F + 2.44, F + 2.47, -3.42, -3.39, coveMat, false);
   bx(-4.92, -4.89, F + 2.44, F + 2.47, -3.4, 3.35, coveMat, false);
@@ -485,26 +530,31 @@ export function createCasa(canvas, options = {}) {
   rb(0.2, 0.26, 0.2, 0.03, M.pot, 4.68, F + 0.8, -2.45);
   for (const nx of [0.745, 3.255]) {
     bx(nx - 0.23, nx + 0.23, F, F + 0.5, -3.4, -2.98, M.oak);
-    const l = lamp('luces', [nx, F + 0.85, -3.1], WARM, 2.6, 4);
+    const l = lamp('luzDormitorio', [nx, F + 0.85, -3.1], WARM, 2.6, 4);
     cyl(0.05, 0.07, 0.18, M.black, nx, F + 0.5, -3.19);
     cyl(0.1, 0.13, 0.17, emissiveMat('#f3e3c8', WARM, 2.2, l), nx, F + 0.68, -3.19);
     addGlow(l, [nx, F + 0.78, -3.19], 0.9, WARM, 0.5);
   }
 
-  // aire acondicionado (split) sobre la cama
-  const ac = lamp('clima', [2.0, F + 1.9, -2.9], TEAL, 1.6, 3.5);
-  rb(0.95, 0.3, 0.24, 0.05, M.white, 2.0, F + 2.02, -3.3);
-  bx(1.58, 2.42, F + 2.03, F + 2.06, -3.19, -3.175, M.frame, false);
-  bx(2.22, 2.38, F + 2.16, F + 2.2, -3.185, -3.17, emissiveMat('#1a2a2a', TEAL, 4, ac), false);
-  const airCount = 70;
-  const airGeo = new THREE.BufferGeometry();
-  const airPos = new Float32Array(airCount * 3);
-  const airSeed = Array.from({ length: airCount }, () => [rnd(), rnd(), rnd()]);
-  airGeo.setAttribute('position', new THREE.BufferAttribute(airPos, 3));
-  const airMat = new THREE.PointsMaterial({ color: 0xa9dcff, map: tex.glow, size: 3, sizeAttenuation: false, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
-  const air = new THREE.Points(airGeo, airMat);
-  air.frustumCulled = false;
-  root.add(air);
+  // aires acondicionados (split), con flujo de aire animado
+  const acUnits = [];
+  function acUnit(channel, x) {
+    const light = lamp(channel, [x, F + 1.9, -2.9], TEAL, 1.6, 3.5);
+    rb(0.95, 0.3, 0.24, 0.05, M.white, x, F + 2.02, -3.3);
+    bx(x - 0.42, x + 0.42, F + 2.03, F + 2.06, -3.19, -3.175, M.frame, false);
+    bx(x + 0.22, x + 0.38, F + 2.16, F + 2.2, -3.185, -3.17, emissiveMat('#1a2a2a', TEAL, 4, light), false);
+    const count = 70;
+    const geo = new THREE.BufferGeometry();
+    const pos = new Float32Array(count * 3);
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const mat = new THREE.PointsMaterial({ color: 0xa9dcff, map: tex.glow, size: 3, sizeAttenuation: false, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+    const pts = new THREE.Points(geo, mat);
+    pts.frustumCulled = false;
+    root.add(pts);
+    acUnits.push({ channel, x, geo, pos, mat, pts, seed: Array.from({ length: count }, () => [rnd(), rnd(), rnd()]) });
+  }
+  acUnit('climaDormitorio', 2.0);
+  acUnit('climaLiving', -0.95);
 
   // ---------- cocina ----------
   bx(4.28, 4.92, F, F + 2.05, 0.1, 0.78, M.steel);
@@ -525,12 +575,10 @@ export function createCasa(canvas, options = {}) {
     cyl(0.17, 0.15, 0.02, M.black, 2.08, F, sz);
     cyl(0.18, 0.17, 0.06, M.upholstery, 2.08, F + 0.62, sz);
   }
-  // tira LED bajo la isla
-  const islandLed = lamp('luces', [2.3, F + 0.5, 1.9], WARM, 1.6, 2.5);
+  const islandLed = lamp('luzCocina', [2.3, F + 0.5, 1.9], WARM, 1.6, 2.5);
   bx(2.48, 2.5, F + 0.8, F + 0.83, 1.0, 2.8, emissiveMat('#fff3e0', WARM, 3, islandLed), false);
-  // colgantes sobre la isla
   for (const pz of [1.45, 2.35]) {
-    const l = lamp('luces', [2.9, F + 1.45, pz], WARM, 4, 5);
+    const l = lamp('luzCocina', [2.9, F + 1.45, pz], WARM, 4, 5);
     cyl(0.004, 0.004, 0.85, M.black, 2.9, F + 1.72, pz, 6);
     cyl(0.05, 0.19, 0.2, emissiveMat('#1f242a', WARM, 0.2, l, 0.4), 2.9, F + 1.52, pz);
     const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.05, 16, 12), emissiveMat('#fff4e0', WARM, 6, l));
@@ -565,22 +613,23 @@ export function createCasa(canvas, options = {}) {
   doorPivot.add(lockLed);
   root.add(doorPivot);
   // panel táctil de la casa, junto a la puerta (lado interior)
-  const panel = lamp('accesos', [1.3, F + 1.25, 3.2], 0x8fc2ff, 0.3, 1.2);
-  bx(1.22, 1.38, F + 1.16, F + 1.34, 3.405, 3.42, emissiveMat('#0c1216', 0x8fc2ff, 1.6, panel), false);
-  // umbral, alero y aplique exterior
+  const panelLight = lamp('cerradura', [1.3, F + 1.25, 3.2], 0x8fc2ff, 0.3, 1.2);
+  bx(1.22, 1.38, F + 1.16, F + 1.34, 3.405, 3.42, emissiveMat('#0c1216', 0x8fc2ff, 1.6, panelLight), false);
+  // umbral, alero, aplique exterior y videoportero
   bx(-0.25, 1.45, 0, F, 3.58, 4.0, M.stone);
   bx(-0.4, 1.6, F + 2.28, F + 2.36, 3.42, 4.32, M.cap);
-  const porch = lamp('luces', [1.34, F + 1.9, 3.85], WARM, 3, 5);
+  const porch = lamp('luzEntrada', [1.34, F + 1.9, 3.85], WARM, 3, 5);
   bx(1.3, 1.38, F + 1.8, F + 2.0, 3.58, 3.64, emissiveMat('#f5ead6', WARM, 3, porch), false);
   addGlow(porch, [1.34, F + 1.9, 3.7], 1.1, WARM, 0.6);
+  const bell = lamp('videoportero', [1.33, F + 1.32, 3.75], 0x8fc2ff, 0.4, 1.2);
+  bx(1.27, 1.39, F + 1.2, F + 1.44, 3.58, 3.61, M.black);
+  cyl(0.025, 0.025, 0.006, emissiveMat('#10151c', 0x8fc2ff, 4, bell), 1.33, F + 1.26, 3.612, 20).rotation.x = Math.PI / 2;
 
   // ---------- jardín ----------
   for (let z = 4.1; z < 7.1; z += 0.62) bx(0.12, 1.08, 0, 0.03, z, z + 0.42, M.stone, false);
-  for (const [bxp, bzp] of [[-0.3, 4.7], [1.5, 4.7], [-0.3, 6.3], [1.5, 6.3]]) {
-    cyl(0.045, 0.05, 0.46, M.black, bxp, 0, bzp, 16);
-  }
-  const path1 = lamp('luces', [0.6, 0.55, 4.7], WARM, 1.5, 3);
-  const path2 = lamp('luces', [0.6, 0.55, 6.3], WARM, 1.5, 3);
+  for (const [bxp, bzp] of [[-0.3, 4.7], [1.5, 4.7], [-0.3, 6.3], [1.5, 6.3]]) cyl(0.045, 0.05, 0.46, M.black, bxp, 0, bzp, 16);
+  const path1 = lamp('luzExterior', [0.6, 0.55, 4.7], WARM, 1.5, 3);
+  const path2 = lamp('luzExterior', [0.6, 0.55, 6.3], WARM, 1.5, 3);
   const bollardMat = emissiveMat('#fff1dc', WARM, 3, path1);
   for (const [bxp, bzp] of [[-0.3, 4.7], [1.5, 4.7], [-0.3, 6.3], [1.5, 6.3]]) {
     cyl(0.05, 0.05, 0.05, bollardMat, bxp, 0.44, bzp, 16);
@@ -599,14 +648,13 @@ export function createCasa(canvas, options = {}) {
   tree(7.9, -4.5, 1.0);
   tree(-5.9, -4.6, 0.9);
   tree(8.0, 6.6, 0.7);
-  const uplight = lamp('luces', [-5.1, 0.25, 5.4], WARM, 3.5, 4);
+  const uplight = lamp('luzExterior', [-5.1, 0.25, 5.4], WARM, 3.5, 4);
   addGlow(uplight, [-5.1, 0.12, 5.4], 0.6, WARM, 0.6);
   for (let x = -6.3; x < -0.9; x += 0.55) {
     const m = new THREE.Mesh(new THREE.IcosahedronGeometry(0.26 + rnd() * 0.1, 1), M.leafDark);
     place(m, x, 0.2, 7.0 + (rnd() - 0.5) * 0.1);
   }
 
-  // cantero de huerta
   bx(4.6, 7.4, 0, 0.22, 5.2, 6.1, M.oak);
   bx(4.66, 7.34, 0.2, 0.23, 5.26, 6.04, std('#3a2a1e', 1), false);
   for (let i = 0; i < 16; i++) {
@@ -619,12 +667,11 @@ export function createCasa(canvas, options = {}) {
   bx(5.65, 8.15, 0, 0.05, 1.55, 1.75, M.coping);
   bx(5.65, 5.85, 0, 0.05, -2.95, 1.55, M.coping);
   bx(7.95, 8.15, 0, 0.05, -2.95, 1.55, M.coping);
-  const pool = lamp('luces', [6.9, 0.35, -0.7], 0x4fd6e8, 4, 5);
+  const pool = lamp('luzPileta', [6.9, 0.35, -0.7], 0x4fd6e8, 4, 5);
   const waterMat = std('#ffffff', 0.08, { map: tex.water, emissive: 0x1aa6c0, emissiveIntensity: 0, emissiveMap: tex.water });
   pool.mats.push({ m: waterMat, base: 1.4 });
   floor(5.85, 7.95, -2.95, 1.55, waterMat, 2.2, 0.025);
   addGlow(pool, [6.9, 0.1, -0.7], 4.2, 0x4fd6e8, 0.16);
-  // reposeras
   for (const lx of [6.3, 7.4]) {
     rb(0.6, 0.12, 1.5, 0.04, M.linen, lx, 0.18, 2.75);
     bx(lx - 0.28, lx + 0.28, 0, 0.18, 2.1, 2.14, M.frame);
@@ -675,116 +722,242 @@ export function createCasa(canvas, options = {}) {
   spray.frustumCulled = false;
   root.add(spray);
 
-  // ---------- etiquetas (anclas en 3D para la interfaz) ----------
-  const anchors = {
-    luces: new THREE.Vector3(-2.4, F + 2.0, 0.2),
-    clima: new THREE.Vector3(2.0, F + 2.75, -3.3),
-    accesos: new THREE.Vector3(0.6, F + 2.75, 3.9),
-    alarma: new THREE.Vector3(5.4, 3.05, 3.9),
-    riego: new THREE.Vector3(-3.1, 0.9, 5.3),
-    cortinas: new THREE.Vector3(-3.0, F + 2.75, -3.45),
-  };
+  // ---------- sensores: balizas que laten donde va cada equipo ----------
+  const markers = [];
+  function marker(channel, pos) {
+    const dot = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex.glow, color: 0x2f7dff, transparent: true, opacity: 0, depthTest: false, depthWrite: false }));
+    dot.scale.set(0.6, 0.6, 1);
+    dot.position.set(...pos);
+    dot.renderOrder = 10;
+    const ring = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex.ring, color: 0x2f7dff, transparent: true, opacity: 0, depthTest: false, depthWrite: false }));
+    ring.position.set(...pos);
+    ring.renderOrder = 10;
+    root.add(dot, ring);
+    markers.push({ channel, dot, ring, phase: rnd() });
+  }
+  marker('sensorPresencia', [-4.75, F + 2.3, -3.25]);
+  marker('enchufes', [-4.55, F + 0.75, 0.9]);
+  marker('sensorApertura', [0.6, F + 2.3, 3.62]);
+  marker('cerradura', [0.95, F + 1.5, 3.66]);
+  marker('videoportero', [1.33, F + 1.32, 3.7]);
+  marker('sensorGas', [4.62, F + 1.3, 2.5]);
+  marker('sensorAgua', [4.55, F + 0.25, 1.28]);
+  marker('botonNoche', [3.255, F + 0.75, -2.95]);
 
-  // ---------- cámara ----------
+  // ---------- resaltado del ambiente elegido ----------
+  const ROOM_RECTS = {
+    living: [[-5, 0, -3.5, 3.5, F + 0.016]],
+    dormitorio: [[0, 5, -3.5, 0, F + 0.016]],
+    cocina: [[1.2, 5, 0, 3.5, F + 0.016]],
+    entrada: [[0, 1.2, 0, 3.5, F + 0.016], [-0.25, 1.45, 3.58, 4.0, F + 0.004]],
+    exterior: [[-6.6, 8.6, 4.0, 7.3, 0.06], [5.25, 8.6, -5.3, 4.0, 0.06], [-6.6, -5.2, -5.3, 4.0, 0.06]],
+  };
+  const highlightMat = new THREE.MeshBasicMaterial({ color: 0x3d8bff, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+  const outlineMat = new THREE.MeshBasicMaterial({ color: 0x6aa8ff, transparent: true, opacity: 0.95, depthWrite: false });
+  const highlights = {};
+  const flat = (w, d, mat, x, y, z, parent) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), mat);
+    m.rotation.x = -Math.PI / 2;
+    m.position.set(x, y, z);
+    parent.add(m);
+  };
+  for (const [room, rects] of Object.entries(ROOM_RECTS)) {
+    const g = new THREE.Group();
+    for (const [x0, x1, z0, z1, y] of rects) {
+      const w = x1 - x0, d = z1 - z0, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, b = 0.07;
+      flat(w, d, highlightMat, cx, y, cz, g);
+      flat(w, b, outlineMat, cx, y + 0.002, z0 + b / 2, g);
+      flat(w, b, outlineMat, cx, y + 0.002, z1 - b / 2, g);
+      flat(b, d, outlineMat, x0 + b / 2, y + 0.002, cz, g);
+      flat(b, d, outlineMat, x1 - b / 2, y + 0.002, cz, g);
+    }
+    g.visible = false;
+    root.add(g);
+    highlights[room] = g;
+  }
+  let highlighted = null;
+
+  // ---------- anclas para etiquetas y botones sobre la escena ----------
+  const anchors = {
+    luces: [-2.4, F + 2.0, 0.2],
+    clima: [2.0, F + 2.75, -3.3],
+    accesos: [0.6, F + 2.75, 3.9],
+    alarma: [5.4, 3.05, 3.9],
+    riego: [-3.1, 0.9, 5.3],
+    cortinas: [-3.0, F + 2.75, -3.45],
+    climaLiving: [-0.95, F + 2.75, -3.3],
+    luzExterior: [0.6, 0.9, 5.4],
+    luzPileta: [6.9, 0.7, -0.7],
+    'room:living': [-2.9, F + 1.4, -0.6],
+    'room:dormitorio': [2.6, F + 1.6, -2.4],
+    'room:cocina': [3.9, F + 1.0, 2.6],
+    'room:entrada': [0.6, 0.1, 6.0],
+    'room:exterior': [7.0, 0.3, 3.0],
+  };
+  for (const [k, v] of Object.entries(anchors)) anchors[k] = new THREE.Vector3(...v);
+
+  // ---------- cámara con transiciones ----------
   let camera;
   let preset = PRESETS[opts.preset] || PRESETS.hero;
   const parallax = { x: 0, y: 0 };
-  const fitPoints = [];
-  for (const x of [-6.7, 8.7]) for (const z of [-5.4, 7.4]) for (const y of [-0.8, 0]) fitPoints.push(new THREE.Vector3(x, y, z));
-  fitPoints.push(new THREE.Vector3(0.6, 3.1, 3.9), new THREE.Vector3(-5.4, 3.0, 5.9), new THREE.Vector3(-5, 3.1, -3.5), new THREE.Vector3(7.9, 2.9, -4.5));
-
   let width = 1, height = 1;
-  function setupCamera() {
+  let view = null; // vista ortográfica actual
+  let tween = null;
+
+  const tmpCam = new THREE.OrthographicCamera();
+  function orient(cam, az, el, target) {
+    const a = THREE.MathUtils.degToRad(az), e = THREE.MathUtils.degToRad(Math.min(89.9, el));
+    const dir = new THREE.Vector3(Math.sin(a) * Math.cos(e), Math.sin(e), Math.cos(a) * Math.cos(e));
+    cam.position.copy(target).addScaledVector(dir, 40);
+    cam.up.set(0, 1, 0);
+    if (el > 89) cam.up.set(0, 0, -1);
+    cam.lookAt(target);
+    cam.updateMatrixWorld();
+  }
+  function viewFor(p) {
+    const target = new THREE.Vector3(...p.target);
+    orient(tmpCam, p.az, p.el, target);
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    const v = new THREE.Vector3();
+    for (const pt of p.points) {
+      v.set(...pt).applyMatrix4(tmpCam.matrixWorldInverse);
+      minX = Math.min(minX, v.x); maxX = Math.max(maxX, v.x);
+      minY = Math.min(minY, v.y); maxY = Math.max(maxY, v.y);
+    }
     const aspect = width / height;
+    let hw = ((maxX - minX) / 2) * p.margin, hh = ((maxY - minY) / 2) * p.margin;
+    if (hw / hh < aspect) hw = hh * aspect; else hh = hw / aspect;
+    return { az: p.az, el: p.el, target, cx: (minX + maxX) / 2, cy: (minY + maxY) / 2, hw, hh };
+  }
+  function pointSize() {
+    const px = renderer.getPixelRatio() * Math.max(0.6, height / 800);
+    // en las vistas de cerca las partículas crecen un poco
+    const zoom = view ? Math.min(2.2, Math.max(1, 9 / view.hh)) : 1;
+    for (const u of acUnits) { u.mat.size = 3.2 * px * zoom; u.mat.sizeAttenuation = false; u.mat.needsUpdate = true; }
+    sprayMat.size = 4 * px * zoom;
+    sprayMat.sizeAttenuation = false;
+    sprayMat.needsUpdate = true;
+  }
+  function applyView(v) {
+    if (!camera || !camera.isOrthographicCamera) camera = new THREE.OrthographicCamera();
+    orient(camera, v.az + parallax.x * 4, v.el + parallax.y * 2, v.target);
+    Object.assign(camera, { left: v.cx - v.hw, right: v.cx + v.hw, top: v.cy + v.hh, bottom: v.cy - v.hh, near: 1, far: 90 });
+    camera.updateProjectionMatrix();
+  }
+  function setupCamera() {
     if (preset.type === 'ortho') {
-      if (!camera || !camera.isOrthographicCamera) camera = new THREE.OrthographicCamera();
-      const az = THREE.MathUtils.degToRad(preset.az + parallax.x * 4);
-      const el = THREE.MathUtils.degToRad(Math.min(89.9, preset.el + parallax.y * 2));
-      const target = new THREE.Vector3(...preset.target);
-      const dir = new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
-      camera.position.copy(target).addScaledVector(dir, 40);
-      camera.up.set(0, 1, 0);
-      if (preset.el > 89) camera.up.set(0, 0, -1);
-      camera.lookAt(target);
-      camera.updateMatrixWorld();
-      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-      const v = new THREE.Vector3();
-      for (const p of fitPoints) {
-        v.copy(p).applyMatrix4(camera.matrixWorldInverse);
-        minX = Math.min(minX, v.x); maxX = Math.max(maxX, v.x);
-        minY = Math.min(minY, v.y); maxY = Math.max(maxY, v.y);
-      }
-      let hw = ((maxX - minX) / 2) * preset.margin, hh = ((maxY - minY) / 2) * preset.margin;
-      if (hw / hh < aspect) hw = hh * aspect; else hh = hw / aspect;
-      const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
-      Object.assign(camera, { left: cx - hw, right: cx + hw, top: cy + hh, bottom: cy - hh, near: 1, far: 90 });
-      camera.updateProjectionMatrix();
-      airMat.size = 3.2 * renderer.getPixelRatio() * Math.max(0.6, height / 800);
-      sprayMat.size = 4 * renderer.getPixelRatio() * Math.max(0.6, height / 800);
-      airMat.sizeAttenuation = sprayMat.sizeAttenuation = false;
+      if (!tween) view = viewFor(preset);
+      applyView(view);
+      pointSize();
     } else {
       if (!camera || !camera.isPerspectiveCamera) camera = new THREE.PerspectiveCamera();
       camera.fov = preset.fov;
-      camera.aspect = aspect;
+      camera.aspect = width / height;
       camera.near = 0.1;
       camera.far = 120;
       camera.position.set(...preset.pos);
       camera.up.set(0, 1, 0);
       camera.lookAt(new THREE.Vector3(...preset.target));
       camera.updateProjectionMatrix();
-      airMat.size = sprayMat.size = 0.07;
-      airMat.sizeAttenuation = sprayMat.sizeAttenuation = true;
+      for (const u of acUnits) { u.mat.size = 0.07; u.mat.sizeAttenuation = true; u.mat.needsUpdate = true; }
+      sprayMat.size = 0.07;
+      sprayMat.sizeAttenuation = true;
+      sprayMat.needsUpdate = true;
     }
-    airMat.needsUpdate = sprayMat.needsUpdate = true;
+  }
+  function stepTween(now) {
+    if (!tween) return false;
+    const k = ease(Math.min(1, (now - tween.t0) / tween.dur));
+    const a = tween.from, b = tween.to;
+    const lerp = (x, y) => x + (y - x) * k;
+    view = {
+      az: lerp(a.az, b.az), el: lerp(a.el, b.el),
+      target: a.target.clone().lerp(b.target, k),
+      cx: lerp(a.cx, b.cx), cy: lerp(a.cy, b.cy), hw: lerp(a.hw, b.hw), hh: lerp(a.hh, b.hh),
+    };
+    applyView(view);
+    if (k >= 1) { tween = null; pointSize(); }
+    return true;
   }
 
-  // ---------- estado y animación ----------
-  const state = { luces: true, cortinas: false, clima: true, accesos: false, alarma: false, riego: false, ...opts.state };
-  const anim = {};
-  const level = (k) => (typeof state[k] === 'number' ? state[k] : state[k] ? 1 : 0);
-  for (const k of DEVICES) anim[k] = level(k);
-  if (opts.intro) anim.luces = 0;
+  // ---------- estado, hora del día y animación ----------
+  const state = Object.fromEntries(CHANNELS.map((c) => [c, 0]));
+  const anim = { ...state };
+  const toLevel = (v) => (typeof v === 'number' ? Math.max(0, Math.min(1, v)) : v ? 1 : 0);
+  function assign(key, value) {
+    const targets = ALIASES[key] || (key in state ? [key] : []);
+    for (const c of targets) state[c] = toLevel(value);
+  }
+  const initial = { luces: true, clima: true, ...opts.state };
+  for (const [k, v] of Object.entries(initial)) assign(k, v);
+  for (const c of CHANNELS) anim[c] = state[c];
+
+  let timeOfDay = null; // null: noche fija
+  let dayMix = 0, goldMix = 0;
+  const NIGHT = { sky: new THREE.Color(0x4a6a8f), ground: new THREE.Color(0x0e141a), key: new THREE.Color(0xa8bcff) };
+  const DAY = { sky: new THREE.Color(0xcfe2ff), ground: new THREE.Color(0x6e604c), key: new THREE.Color(0xfff2e0) };
+  const GOLD = { sky: new THREE.Color(0xffc9a3), key: new THREE.Color(0xffa860) };
+  const sunPos = new THREE.Vector3();
+  function applyTime() {
+    if (timeOfDay === null) { dayMix = 0; goldMix = 0; }
+    else {
+      const t = timeOfDay;
+      dayMix = smooth(SUNRISE - 35, SUNRISE + 45, t) * (1 - smooth(SUNSET - 45, SUNSET + 35, t));
+      goldMix = Math.max(Math.exp(-(((t - SUNRISE - 20) / 45) ** 2)), Math.exp(-(((t - SUNSET + 10) / 45) ** 2)));
+    }
+    const arc = Math.min(1, Math.max(0, ((timeOfDay ?? 0) - SUNRISE + 30) / (SUNSET - SUNRISE + 60)));
+    sunPos.set(14 - 28 * arc, 3 + 13 * Math.sin(Math.PI * arc), -3 + 11 * arc);
+    keyLight.position.copy(MOON_POS).lerp(sunPos, dayMix);
+    const keyDay = DAY.key.clone().lerp(GOLD.key, goldMix * 0.85);
+    keyLight.color.copy(NIGHT.key).lerp(keyDay, dayMix);
+    keyLight.intensity = 1.1 + (3.1 - 1.1) * dayMix - goldMix * dayMix * 0.8;
+    const skyDay = DAY.sky.clone().lerp(GOLD.sky, goldMix * 0.6);
+    hemi.color.copy(NIGHT.sky).lerp(skyDay, dayMix);
+    hemi.groundColor.copy(NIGHT.ground).lerp(DAY.ground, dayMix);
+    hemi.intensity = 0.9 + 0.7 * dayMix;
+    scene.environmentIntensity = 0.1 + 0.3 * dayMix;
+    renderer.toneMappingExposure = 1.05 - 0.1 * dayMix;
+  }
 
   const lockClosed = new THREE.Color(TEAL), lockOpen = new THREE.Color(0xffb35c);
   const aimDir = new THREE.Vector3();
   const down = new THREE.Vector3(0, -1, 0);
+  const up = new THREE.Vector3(0, 1, 0);
 
   function applyState(t) {
-    for (const e of lamps.luces) setLevel(e, anim.luces);
+    for (const c of CHANNELS) for (const e of lamps[c]) setLevel(e, anim[c]);
     for (const b of blinds) {
-      const s = 0.04 + 0.96 * anim.cortinas;
+      const s = 0.04 + 0.96 * anim[b.channel];
       b.panel.scale.y = s;
       b.panel.position.y = (-b.hgt * s) / 2;
       b.bar.position.y = -b.hgt * s;
     }
-    for (const e of lamps.clima) setLevel(e, anim.clima);
-    for (const e of lamps.accesos) setLevel(e, 1);
-    doorPivot.rotation.y = 1.25 * anim.accesos;
-    lockLedMat.emissive.copy(lockClosed).lerp(lockOpen, anim.accesos);
-    for (const e of lamps.alarma) setLevel(e, anim.alarma);
+    doorPivot.rotation.y = 1.25 * anim.puerta;
+    lockLedMat.emissive.copy(lockClosed).lerp(lockOpen, anim.puerta);
+
     coneMat.opacity = 0.22 * anim.alarma;
     cone.visible = anim.alarma > 0.01;
     const sweep = Math.sin(t * 0.6) * 0.45;
     aimDir.copy(camAim).sub(camHead.position);
-    aimDir.applyAxisAngle(new THREE.Vector3(0, 1, 0), sweep * anim.alarma).normalize();
+    aimDir.applyAxisAngle(up, sweep * anim.alarma).normalize();
     camHead.lookAt(camHead.position.clone().add(aimDir));
     cone.quaternion.setFromUnitVectors(down, aimDir);
 
-    // flujo de aire del split
-    airMat.opacity = 0.55 * anim.clima;
-    air.visible = anim.clima > 0.01;
-    if (air.visible) {
-      for (let i = 0; i < airCount; i++) {
-        const [a, b, c] = airSeed[i];
+    for (const u of acUnits) {
+      const v = anim[u.channel];
+      u.mat.opacity = 0.55 * v;
+      u.pts.visible = v > 0.01;
+      if (!u.pts.visible) continue;
+      for (let i = 0; i < u.seed.length; i++) {
+        const [a, b, c] = u.seed[i];
         const p = (t * 0.3 + a) % 1;
-        airPos[i * 3] = 1.62 + b * 0.76 + Math.sin(t * 1.3 + c * 6) * 0.04;
-        airPos[i * 3 + 1] = F + 2.0 - p * 0.55 - p * p * 0.45;
-        airPos[i * 3 + 2] = -3.16 + p * 1.7;
+        u.pos[i * 3] = u.x - 0.38 + b * 0.76 + Math.sin(t * 1.3 + c * 6) * 0.04;
+        u.pos[i * 3 + 1] = F + 2.0 - p * 0.55 - p * p * 0.45;
+        u.pos[i * 3 + 2] = -3.16 + p * 1.7;
       }
-      airGeo.attributes.position.needsUpdate = true;
+      u.geo.attributes.position.needsUpdate = true;
     }
 
-    // riego: arcos de agua
     sprayMat.opacity = 0.85 * anim.riego;
     spray.visible = anim.riego > 0.01;
     if (spray.visible) {
@@ -807,11 +980,28 @@ export function createCasa(canvas, options = {}) {
       waterGeo.attributes.position.needsUpdate = true;
     }
     tex.water.offset.set(Math.sin(t * 0.2) * 0.05, t * 0.02);
+
+    const markerScale = view ? Math.max(0.55, Math.min(1.2, view.hh / 6)) : 1;
+    for (const m of markers) {
+      const v = anim[m.channel];
+      const p = (t * 0.7 + m.phase) % 1;
+      m.dot.material.opacity = 0.95 * v;
+      m.ring.material.opacity = (1 - p) * 0.9 * v;
+      const r = (0.25 + p * 0.75) * markerScale;
+      m.ring.scale.set(r, r, 1);
+      m.dot.scale.set(0.6 * markerScale, 0.6 * markerScale, 1);
+      m.dot.visible = m.ring.visible = v > 0.01;
+    }
+    for (const [room, g] of Object.entries(highlights)) {
+      g.visible = room === highlighted;
+    }
+    highlightMat.opacity = 0.16 + 0.08 * Math.sin(t * 2.4);
+    applyTime();
   }
 
-  // efectos que necesitan animarse aunque nadie toque nada
   function continuous() {
-    return anim.clima > 0.01 || anim.alarma > 0.01 || anim.riego > 0.01;
+    return anim.climaLiving > 0.01 || anim.climaDormitorio > 0.01 || anim.alarma > 0.01 || anim.riego > 0.01
+      || highlighted !== null || markers.some((m) => anim[m.channel] > 0.01);
   }
 
   const projected = new THREE.Vector3();
@@ -819,7 +1009,7 @@ export function createCasa(canvas, options = {}) {
     const out = {};
     for (const [k, v] of Object.entries(anchors)) {
       projected.copy(v).project(camera);
-      out[k] = { x: (projected.x * 0.5 + 0.5) * width, y: (-projected.y * 0.5 + 0.5) * height, visible: projected.z < 1 };
+      out[k] = { x: (projected.x * 0.5 + 0.5) * width, y: (-projected.y * 0.5 + 0.5) * height, visible: projected.z < 1 && Math.abs(projected.x) < 1.05 && Math.abs(projected.y) < 1.05 };
     }
     return out;
   }
@@ -831,14 +1021,14 @@ export function createCasa(canvas, options = {}) {
     last = now;
     clock += dt;
     if (running) raf = requestAnimationFrame(frame);
-    let moving = false;
-    for (const k of DEVICES) {
-      const target = level(k);
-      const speed = k === 'luces' && opts.intro ? 1.1 : 2.2;
-      if (Math.abs(anim[k] - target) > 0.001) {
-        anim[k] += Math.sign(target - anim[k]) * Math.min(Math.abs(target - anim[k]), dt * speed);
+    let moving = stepTween(now);
+    for (const c of CHANNELS) {
+      const target = state[c];
+      const speed = c === 'puerta' ? 1.6 : 2.2;
+      if (Math.abs(anim[c] - target) > 0.001) {
+        anim[c] += Math.sign(target - anim[c]) * Math.min(Math.abs(target - anim[c]), dt * speed);
         moving = true;
-      } else anim[k] = target;
+      } else anim[c] = target;
     }
     // los efectos continuos se dibujan a ~30 cuadros por segundo para cuidar la batería
     const idleEffect = !moving && !dirty && continuous() && now - lastDraw > 32;
@@ -851,43 +1041,74 @@ export function createCasa(canvas, options = {}) {
     }
   }
 
-  function resize(w, h) {
-    width = Math.max(1, w);
-    height = Math.max(1, h);
-    renderer.setSize(width, height, false);
-    setupCamera();
-    dirty = true;
-    if (!running) renderNow();
-  }
-
   function renderNow() {
     applyState(clock);
     renderer.render(scene, camera);
     if (opts.onFrame) opts.onFrame(labels());
   }
 
+  function settle() {
+    if (!running) {
+      for (const c of CHANNELS) anim[c] = state[c];
+      if (tween) { view = tween.to; tween = null; setupCamera(); }
+      renderNow();
+    }
+  }
+
   return {
     state,
     set(key, value) {
-      state[key] = typeof value === 'number' ? value : !!value;
+      assign(key, value);
       dirty = true;
-      if (!running) {
-        for (const k of DEVICES) anim[k] = level(k);
-        renderNow();
-      }
+      settle();
+    },
+    setMany(values) {
+      for (const [k, v] of Object.entries(values)) assign(k, v);
+      dirty = true;
+      settle();
+    },
+    setTime(minutes) {
+      timeOfDay = minutes;
+      dirty = true;
+      if (!running) renderNow();
+    },
+    focus(name, animate = true) {
+      const next = PRESETS[name];
+      if (!next || next.type !== 'ortho' || preset.type !== 'ortho') return;
+      const to = viewFor(next);
+      if (animate && view && running) tween = { from: view, to, t0: performance.now(), dur: 900 };
+      else { tween = null; view = to; }
+      preset = next;
+      applyView(view);
+      dirty = true;
+      if (!running) renderNow();
+    },
+    highlight(room) {
+      highlighted = room && highlights[room] ? room : null;
+      dirty = true;
+      if (!running) renderNow();
     },
     setParallax(x, y) {
       parallax.x = x;
       parallax.y = y;
-      setupCamera();
+      if (view) applyView(view);
       dirty = true;
     },
     setPreset(name) {
       preset = PRESETS[name] || PRESETS.hero;
+      tween = null;
       setupCamera();
       dirty = true;
     },
-    resize,
+    resize(w, h) {
+      width = Math.max(1, w);
+      height = Math.max(1, h);
+      renderer.setSize(width, height, false);
+      tween = null;
+      setupCamera();
+      dirty = true;
+      if (!running) renderNow();
+    },
     labels,
     start() {
       if (running) return;
@@ -901,9 +1122,21 @@ export function createCasa(canvas, options = {}) {
       raf = 0;
     },
     renderStill(t = 2.0) {
-      for (const k of DEVICES) anim[k] = level(k);
+      for (const c of CHANNELS) anim[c] = state[c];
       clock = t;
       renderNow();
+    },
+    dispose() {
+      running = false;
+      if (raf) cancelAnimationFrame(raf);
+      scene.traverse((o) => {
+        if (o.geometry) o.geometry.dispose();
+        if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose());
+      });
+      Object.values(tex).forEach((t) => t.dispose());
+      pmrem.dispose();
+      renderer.dispose();
+      renderer.forceContextLoss();
     },
     renderer,
   };

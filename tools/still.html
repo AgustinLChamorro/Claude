@@ -13,6 +13,7 @@
   const w = +q.get('w') || 1200, h = +q.get('h') || 900;
   const on = (q.get('on') || 'luces,clima').split(',').filter(Boolean);
   const state = { luces: false, cortinas: false, clima: false, accesos: false, alarma: false, riego: false };
+  if (q.get('none')) Object.assign(state, {});
   for (const item of on) { const [k, v] = item.split(':'); state[k] = v ? +v : true; }
   const canvas = document.getElementById('c');
   canvas.style.width = w + 'px';
@@ -26,6 +27,8 @@
     state,
   });
   casa.resize(w, h);
+  if (q.get('time')) casa.setTime(+q.get('time'));
+  if (q.get('highlight')) casa.highlight(q.get('highlight'));
   casa.renderStill(+q.get('t') || 2.2);
   window.__done = true;
 </script>

@@ -8,7 +8,7 @@ La misma casa en 3D aparece en tres partes interactivas:
 - **Un día con i2home:** una barra de horario (o el botón Reproducir) recorre las 24 horas. Cambian el cielo y la luz del sol, se disparan las automatizaciones (riego, "Me voy de casa", "Llegué a casa", atardecer, "Buenas noches") y quedan anotadas en el registro de la casa.
 - **Armá tu casa:** el visitante elige ambientes y dispositivos, la cámara se acerca a cada ambiente y se ve cada equipo encendido. La selección se manda por WhatsApp o pasa al formulario de contacto con los intereses ya marcados.
 
-Las imágenes de los servicios también salen de esa escena.
+Los servicios, "Cómo funciona", "¿Por qué elegir i2home?" y la banda final usan fotos.
 
 ## Estructura
 
@@ -47,22 +47,23 @@ npm install
 npm run dev        # abre http://localhost:8080
 ```
 
-## Fotos reales
+## Fotos
 
-Las tarjetas de Climatización, Control de accesos, Cortinas y Riego ya usan fotos (`assets/img/foto-*.webp`, recortadas en 4:3; los originales están en `assets/fotos/originales/`). El resto sigue con renders de la casa 3D. Para reemplazar otra, guardala en `assets/img/` y cambiá la ruta en `index.html`. Conviene que sea horizontal 4:3 y de al menos 1200 px de ancho:
+Las fotos están en `assets/img/foto-*.webp`, recortadas al formato de cada lugar y optimizadas. Los originales quedan en `assets/fotos/originales/`.
 
-| Archivo | Qué debería mostrar |
+| Archivo | Dónde aparece |
 | --- | --- |
-| `iluminacion.webp` | Living de noche con luces cálidas, tiras LED o dimmers |
-| `clima.webp` | Dormitorio o living con split, o una mano con el celular ajustando la temperatura |
-| `seguridad.webp` | Cámara de seguridad instalada en una fachada |
-| `accesos.webp` | Cerradura inteligente o videoportero en una puerta de entrada |
-| `cortinas.webp` | Ventanal con cortina roller o persiana motorizada |
-| `riego.webp` | Jardín con aspersores regando |
-| `cocina.webp` | Cocina moderna iluminada (sección "¿Por qué elegir i2home?") |
-| `amplia.webp` | Casa de noche con las ventanas encendidas (banda final, formato 2:1) |
+| `foto-iluminacion.webp` | Tarjeta Iluminación |
+| `foto-clima.webp` | Tarjeta Climatización |
+| `foto-seguridad.webp` | Tarjeta Seguridad |
+| `foto-accesos.webp` | Tarjeta Control de accesos |
+| `foto-cortinas.webp` | Tarjeta Cortinas y persianas |
+| `foto-riego.webp` | Tarjeta Riego automático |
+| `foto-hub.webp` | Cómo funciona |
+| `foto-dormitorio.webp` | ¿Por qué elegir i2home? |
+| `foto-casa.webp` | Banda final antes del contacto |
 
-Las fotos de trabajos propios son las que más confianza generan. Si se usan fotos de bancos de imágenes, conviene elegir las de licencia libre para uso comercial (por ejemplo Unsplash o Pexels) y no las marcadas como premium.
+Para cambiar una, reemplazá el archivo por otro con el mismo nombre y formato parecido (las tarjetas son 4:3) o cambiá la ruta en `index.html`. La casa 3D sigue en el inicio, en "Un día con i2home" y en "Armá tu casa".
 
 ## Cambiar la escena 3D o las imágenes
 

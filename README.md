@@ -60,7 +60,7 @@ Las fotos están en `assets/img/foto-*.webp`, recortadas al formato de cada luga
 | `foto-cortinas.webp` | Tarjeta Cortinas y persianas |
 | `foto-riego.webp` | Tarjeta Riego automático |
 | `foto-hub.webp` | Cómo funciona |
-| `foto-dormitorio.webp` | ¿Por qué elegir i2home? |
+| `foto-familia.webp` | ¿Por qué elegir i2home? |
 | `foto-casa.webp` | Banda final antes del contacto |
 
 Para cambiar una, reemplazá el archivo por otro con el mismo nombre y formato parecido (las tarjetas son 4:3) o cambiá la ruta en `index.html`. La casa 3D sigue en el inicio, en "Un día con i2home" y en "Armá tu casa".

@@ -702,7 +702,7 @@ h1 em, h2 em { font-style: normal; color: var(--blue); }
 /* por qué */
 .why-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); align-items: center; }
 .why-media { border-radius: var(--radius-xl); overflow: hidden; aspect-ratio: 5 / 6; border: 1px solid var(--navy-line); }
-.why-media img { width: 100%; height: 100%; object-fit: cover; object-position: 60% 50%; }
+.why-media img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
 .why-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; }
 .reasons { display: grid; gap: 4px; margin-top: 12px; width: 100%; }
 .reasons li { display: flex; gap: 18px; padding: 18px 0; border-top: 1px solid var(--navy-line); }

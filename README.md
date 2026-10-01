@@ -49,7 +49,7 @@ npm run dev        # abre http://localhost:8080
 
 ## Fotos reales
 
-Hoy las imágenes de los servicios son renders de la casa 3D. Para reemplazarlas por fotos, guardá cada una en `assets/img/` con el mismo nombre (WebP u otro formato, cambiando la extensión en `index.html`), en horizontal 4:3 y con al menos 1200 px de ancho:
+Las tarjetas de Climatización, Control de accesos, Cortinas y Riego ya usan fotos (`assets/img/foto-*.webp`, recortadas en 4:3; los originales están en `assets/fotos/originales/`). El resto sigue con renders de la casa 3D. Para reemplazar otra, guardala en `assets/img/` y cambiá la ruta en `index.html`. Conviene que sea horizontal 4:3 y de al menos 1200 px de ancho:
 
 | Archivo | Qué debería mostrar |
 | --- | --- |
